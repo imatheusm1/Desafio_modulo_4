@@ -1,0 +1,66 @@
+use company;
+show tables;
+
+select * from departament;
+select * from employee;
+select * from dept_locations;
+
+-- parte 1 
+-- Qual o departamento com maior número de pessoas? 
+SELECT dname AS department_name, COUNT(e.Dno) AS employee_count
+FROM departament d
+JOIN employee e ON Dnumber = e.Dno
+GROUP BY dname
+ORDER BY employee_count DESC;
+
+-- Quais são os departamentos por cidade? 
+SELECT dlocation AS name_cidade, dname AS department_name
+FROM dept_locations c
+JOIN departament d ON c.Dnumber = d.Dnumber
+GROUP BY c.Dlocation, d.Dname
+ORDER BY c.Dlocation, d.Dname;
+
+-- Relação de empregrados por departamento
+SELECT dname AS department_name, Fname AS employee_name
+FROM departament d
+JOIN employee e ON Dnumber = Dno
+ORDER BY dname, Fname;
+
+
+CREATE INDEX idx_employee_dno ON employee(Dno);
+CREATE INDEX idx_departament_dnumber ON departament(Dnumber);
+CREATE INDEX idx_departament_dname ON departament(dname);
+
+-- O tipo utilizado foi o B-tree pois é o padrão na maioria dos bancos de dados relacionais,
+-- oferecendo um maior equilibrio entre as operações de leitura e escrita ;
+
+
+-- parte 2 
+
+DELIMITER //
+
+CREATE PROCEDURE controlle_company (
+    IN action TINYINT,
+    IN department_id INT,
+    IN department_name VARCHAR(255),
+    IN employee_id INT,
+    IN employee_name VARCHAR(255),
+    IN employee_department_id INT,
+    IN employee_city_id INT
+)
+BEGIN
+    CASE action
+        WHEN 1 THEN -- Insert into departament
+            INSERT INTO departament (Dnumber, dname)
+            VALUES (department_id, department_name);
+        WHEN 2 THEN 
+            UPDATE departament
+            SET dname = department_name
+            WHERE Dnumber = department_id;
+        WHEN 3 THEN 
+            DELETE FROM departament
+            WHERE Dnumber = department_id;
+    END CASE;
+END //
+
+DELIMITER ;
